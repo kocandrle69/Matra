@@ -90,7 +90,7 @@ select option{background:var(--surf)}
 <script>
 // ── CONFIG ────────────────────────────────────────────────
 const SUPABASE_URL = 'https://vrqrwujuevrwjkuqxnjt.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZycXJ3dWp1ZXZyd2prdXF4bmp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNzE1NjQsImV4cCI6MjA5MTk0NzU2NH0.3pCDPbkKvtuUxNPTynarA-s8elt1pGgNaMAKrA10U38';
+const SUPABASE_ANON_KEY = 'REPLACE_WITH_YOUR_ANON_KEY';
 const SITE_URL = 'https://kocandrle69.github.io/Matra/';
 
 // ── LEVELS ────────────────────────────────────────────────
@@ -276,7 +276,8 @@ function setLang(l) {
 
 // ── SUPABASE OPS ──────────────────────────────────────────
 async function loadProfile(userId) {
-  const { data } = await sb.from('profiles').select('*').eq('id', userId).single();
+  const { data, error } = await sb.from('profiles').select('*').eq('id', userId).maybeSingle();
+  if (error) console.error('loadProfile:', error);
   return data;
 }
 async function loadSessions(userId, level) {
@@ -696,13 +697,20 @@ async function handleSession(session) {
   if (!session) { screen = 'auth'; render(); return; }
   const user = session.user;
   currentUserId = user.id;
+
+  const timer = setTimeout(() => {
+    if (screen === 'loading') { screen = 'auth'; render(); }
+  }, 7000);
+
   try {
     profile = await loadProfile(user.id);
+    clearTimeout(timer);
     if (!profile) { screen = 'setup'; render(); return; }
     sessions = await loadSessions(user.id, profile.level);
     screen = 'main'; render();
   } catch (e) {
-    console.error('handleSession error:', e);
+    clearTimeout(timer);
+    console.error('handleSession:', e);
     screen = 'auth'; render();
   }
 }
