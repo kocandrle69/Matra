@@ -90,7 +90,7 @@ select option{background:var(--surf)}
 <script>
 // ── CONFIG ────────────────────────────────────────────────
 const SUPABASE_URL = 'https://vrqrwujuevrwjkuqxnjt.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZycXJ3dWp1ZXZyd2prdXF4bmp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNzE1NjQsImV4cCI6MjA5MTk0NzU2NH0.3pCDPbkKvtuUxNPTynarA-s8elt1pGgNaMAKrA10U38';
+const SUPABASE_ANON_KEY = 'REPLACE_WITH_YOUR_ANON_KEY';
 const SITE_URL = 'https://kocandrle69.github.io/Matra/';
 
 // ── LEVELS ────────────────────────────────────────────────
@@ -107,12 +107,16 @@ const LEVELS = {
 const TR = {
   cs:{
     appTitle:'Mantra tracker',loading:'Načítání…',
-    emailLabel:'Přihlásit se přes e-mail',emailPh:'tvuj@email.cz',
-    sendLink:'Odeslat přihlašovací odkaz',
-    sentTitle:'Odkaz odeslán',
-    sentText:'Zkontroluj e-mail na adrese {email} a klikni na přihlašovací odkaz.',
-    sentNote:'Odkaz platí 1 hodinu. Pokud email nevidíš, zkontroluj složku Spam — přijde z adresy onboarding@resend.dev.',
-    backToEmail:'Zadat jiný e-mail',
+    emailLabel:'Přihlásit se',emailPh:'tvuj@email.cz',
+    passwordLabel:'Heslo',passwordPh:'Tvoje heslo',
+    signInBtn:'Přihlásit se',
+    forgotPwd:'Zapomněl/a jsi heslo?',toRegister:'Nový uživatel? Zaregistruj se',
+    registerTitle:'Nový účet',confirmPwdLabel:'Potvrdit heslo',confirmPwdPh:'Zopakuj heslo',
+    registerBtn:'Zaregistrovat se',toSignIn:'Už máš účet? Přihlásit se',
+    resetTitle:'Obnovit heslo',resetNote:'Pošleme ti odkaz pro nastavení nového hesla.',
+    resetBtn:'Odeslat odkaz',resetSent:'Odkaz odeslán. Zkontroluj e-mail.',
+    authErrWrong:'Nesprávný e-mail nebo heslo.',authErrExists:'Tento e-mail je již zaregistrován.',
+    authErrShort:'Heslo musí mít alespoň 6 znaků.',authErrMismatch:'Hesla se neshodují.',
     setupTitle:'Nastavení profilu',nameLabel:'Jméno',namePh:'Tvoje jméno',
     levelLabel:'Level',startMalasLabel:'Již odříkáno mál (pokud začínáš se stavem)',
     startAgiyariLabel:'Z toho při agiyari',createProfile:'Uložit a začít',
@@ -137,18 +141,22 @@ const TR = {
     h2t:'Jak se počítají opakování',h2b:'Mála má 108 kuliček (+ 1 gurukulička). Jedno kolo máły = 108 opakování mantry. Do trackeru vždy zadáváš počet mál — opakování se počítají automaticky (mály × 108). Cílový počet opakování je vyjádřen přímo (např. 250 000), ale sledovat stačí mály.',
     h3t:'Jak to funguje',h3b:'Po dokončení cílového počtu opakování je třeba dokončit také agiyari (10 % z celkového cíle). Až poté lze u gurua požádat o postup do dalšího levelu.',
     h4t:'Přidat aplikaci na plochu',h4b:'Android (Chrome): tečky vpravo nahoře → Přidat na úvodní obrazovku. iOS (Safari): tlačítko sdílení → Přidat na plochu. PC (Chrome): ikona instalace v adresním řádku nebo Menu → Nainstalovat aplikaci. Po přidání se otevírá bez panelu prohlížeče jako klasická appka.',
-    h5t:'Přihlášení',h5b:'Přihlašuješ se přes odkaz zaslaný na e-mail — žádné heslo. Na stejném zařízení a prohlížeči zůstaneš přihlášen automaticky. Na novém zařízení stačí zadat e-mail znovu.',
+    h5t:'Přihlášení',h5b:'Přihlašuješ se e-mailem a heslem. Při první návštěvě klikni na "Nový uživatel? Zaregistruj se" a zvol si heslo. Na stejném zařízení zůstaneš přihlášen automaticky. Na novém zařízení se přihlaš znovu stejným e-mailem a heslem.',
     levelNames:{'0':'Mantra Deeksha Level 0','1':'Tantra Deeksha Level 1','2':'Tantra Deeksha Level 2','3':'Tantra Deeksha Level 3','4':'Tantra Deeksha Level 4','5':'Tantra Deeksha Level 5'},
     levelOpts:{'0':'Mantra Deeksha Level 0 — 125 000 opakování','1':'Tantra Deeksha Level 1 — 250 000 opakování','2':'Tantra Deeksha Level 2 — 600 000 opakování','3':'Tantra Deeksha Level 3 — 600 000 opakování','4':'Tantra Deeksha Level 4 — 250 000 opakování','5':'Tantra Deeksha Level 5 — 500 000 opakování'}
   },
   en:{
     appTitle:'Mantra tracker',loading:'Loading…',
-    emailLabel:'Sign in with email',emailPh:'your@email.com',
-    sendLink:'Send sign-in link',
-    sentTitle:'Link sent',
-    sentText:'Check your email at {email} and click the sign-in link.',
-    sentNote:'The link is valid for 1 hour. If you don\'t see the email, check your Spam folder — it comes from onboarding@resend.dev.',
-    backToEmail:'Use a different email',
+    emailLabel:'Sign in',emailPh:'your@email.com',
+    passwordLabel:'Password',passwordPh:'Your password',
+    signInBtn:'Sign in',
+    forgotPwd:'Forgot your password?',toRegister:'New user? Register',
+    registerTitle:'New account',confirmPwdLabel:'Confirm password',confirmPwdPh:'Repeat password',
+    registerBtn:'Register',toSignIn:'Already have an account? Sign in',
+    resetTitle:'Reset password',resetNote:'We\'ll send you a link to set a new password.',
+    resetBtn:'Send link',resetSent:'Link sent. Check your email.',
+    authErrWrong:'Incorrect email or password.',authErrExists:'This email is already registered.',
+    authErrShort:'Password must be at least 6 characters.',authErrMismatch:'Passwords do not match.',
     setupTitle:'Profile setup',nameLabel:'Name',namePh:'Your name',
     levelLabel:'Level',startMalasLabel:'Mālas already completed (if starting with existing progress)',
     startAgiyariLabel:'Of which at agiyari',createProfile:'Save and start',
@@ -173,18 +181,22 @@ const TR = {
     h2t:'How repetitions are counted',h2b:'A mālā has 108 beads (+ 1 guru bead). One round = 108 repetitions of the mantra. You always enter the number of mālas — repetitions are calculated automatically (mālas × 108). The target is expressed in repetitions (e.g. 250,000) but tracking mālas is all you need.',
     h3t:'How it works',h3b:'After completing the target number of repetitions, the agiyari portion (10% of total goal) must also be completed before requesting advancement to the next level from the Guru.',
     h4t:'Add app to home screen',h4b:'Android (Chrome): three dots top right → Add to Home screen. iOS (Safari): share button → Add to Home Screen. PC (Chrome): install icon in address bar or Menu → Install app. Once added it opens without the browser bar, just like a regular app.',
-    h5t:'Login',h5b:'You sign in via a link sent to your email — no password needed. On the same device and browser you will stay logged in automatically. On a new device, just enter your email again.',
+    h5t:'Login',h5b:'You sign in with your email and password. On your first visit, tap "New user? Register" and choose a password. On the same device you will stay signed in automatically. On a new device, sign in again with the same email and password.',
     levelNames:{'0':'Mantra Deeksha Level 0','1':'Tantra Deeksha Level 1','2':'Tantra Deeksha Level 2','3':'Tantra Deeksha Level 3','4':'Tantra Deeksha Level 4','5':'Tantra Deeksha Level 5'},
     levelOpts:{'0':'Mantra Deeksha Level 0 — 125,000 repetitions','1':'Tantra Deeksha Level 1 — 250,000 repetitions','2':'Tantra Deeksha Level 2 — 600,000 repetitions','3':'Tantra Deeksha Level 3 — 600,000 repetitions','4':'Tantra Deeksha Level 4 — 250,000 repetitions','5':'Tantra Deeksha Level 5 — 500,000 repetitions'}
   },
   hi:{
     appTitle:'मंत्र ट्रैकर',loading:'लोड हो रहा है…',
-    emailLabel:'ईमेल से लॉगिन करें',emailPh:'aapka@email.com',
-    sendLink:'लॉगिन लिंक भेजें',
-    sentTitle:'लिंक भेज दिया गया',
-    sentText:'{email} पर आए ईमेल में लॉगिन लिंक पर क्लिक करें।',
-    sentNote:'लिंक 1 घंटे के लिए वैध है। यदि ईमेल न दिखे तो Spam फ़ोल्डर देखें — यह onboarding@resend.dev से आएगा।',
-    backToEmail:'अलग ईमेल दर्ज करें',
+    emailLabel:'लॉगिन करें',emailPh:'aapka@email.com',
+    passwordLabel:'पासवर्ड',passwordPh:'आपका पासवर्ड',
+    signInBtn:'लॉगिन करें',
+    forgotPwd:'पासवर्ड भूल गए?',toRegister:'नए उपयोगकर्ता? रजिस्टर करें',
+    registerTitle:'नया खाता',confirmPwdLabel:'पासवर्ड पुष्टि करें',confirmPwdPh:'पासवर्ड दोहराएं',
+    registerBtn:'रजिस्टर करें',toSignIn:'खाता है? लॉगिन करें',
+    resetTitle:'पासवर्ड रीसेट करें',resetNote:'हम आपको नया पासवर्ड सेट करने का लिंक भेजेंगे।',
+    resetBtn:'लिंक भेजें',resetSent:'लिंक भेज दिया गया। ईमेल देखें।',
+    authErrWrong:'गलत ईमेल या पासवर्ड।',authErrExists:'यह ईमेल पहले से रजिस्टर है।',
+    authErrShort:'पासवर्ड कम से कम 6 अक्षर का होना चाहिए।',authErrMismatch:'पासवर्ड मेल नहीं खाते।',
     setupTitle:'प्रोफ़ाइल सेटअप',nameLabel:'नाम',namePh:'आपका नाम',
     levelLabel:'लेवल',startMalasLabel:'पहले से पूर्ण मालाओं की संख्या',
     startAgiyariLabel:'जिनमें से अगियारी में',createProfile:'सहेजें और शुरू करें',
@@ -209,7 +221,7 @@ const TR = {
     h2t:'जप की गणना कैसे होती है',h2b:'एक माला में 108 मनके होते हैं (+ 1 गुरु मनका)। एक माला का चक्कर = 108 जप। आप हमेशा मालाओं की संख्या दर्ज करते हैं — जप स्वचालित रूप से गणना होती है (मालाएं × 108)। लक्ष्य जप में व्यक्त है, लेकिन मालाएं ट्रैक करना ही पर्याप्त है।',
     h3t:'यह कैसे काम करता है',h3b:'लक्ष्य जप संख्या पूर्ण होने के बाद, अगियारी भाग (कुल लक्ष्य का 10%) भी पूरा करना आवश्यक है। उसके बाद ही गुरु से अगले लेवल के लिए निवेदन किया जा सकता है।',
     h4t:'ऐप को होम स्क्रीन पर जोड़ें',h4b:'Android (Chrome): ऊपर दाईं ओर तीन बिंदु → होम स्क्रीन पर जोड़ें। iOS (Safari): शेयर बटन → होम स्क्रीन पर जोड़ें। PC (Chrome): एड्रेस बार में इंस्टॉल आइकन या मेनू → ऐप इंस्टॉल करें। जोड़ने के बाद ऐप बिना ब्राउज़र बार के खुलता है।',
-    h5t:'लॉगिन',h5b:'आप ईमेल पर भेजे गए लिंक से लॉगिन करते हैं — कोई पासवर्ड नहीं। एक ही डिवाइस और ब्राउज़र पर आप अपने आप लॉगिन रहेंगे। नए डिवाइस पर दोबारा ईमेल दर्ज करें।',
+    h5t:'लॉगिन',h5b:'आप अपने ईमेल और पासवर्ड से लॉगिन करते हैं। पहली बार "नए उपयोगकर्ता? रजिस्टर करें" पर टैप करें और पासवर्ड चुनें। एक ही डिवाइस पर आप अपने आप लॉगिन रहेंगे। नए डिवाइस पर उसी ईमेल और पासवर्ड से लॉगिन करें।',
     levelNames:{'0':'मंत्र दीक्षा लेवल 0','1':'तंत्र दीक्षा लेवल 1','2':'तंत्र दीक्षा लेवल 2','3':'तंत्र दीक्षा लेवल 3','4':'तंत्र दीक्षा लेवल 4','5':'तंत्र दीक्षा लेवल 5'},
     levelOpts:{'0':'मंत्र दीक्षा लेवल 0 — 1,25,000 जप','1':'तंत्र दीक्षा लेवल 1 — 2,50,000 जप','2':'तंत्र दीक्षा लेवल 2 — 6,00,000 जप','3':'तंत्र दीक्षा लेवल 3 — 6,00,000 जप','4':'तंत्र दीक्षा लेवल 4 — 2,50,000 जप','5':'तंत्र दीक्षा लेवल 5 — 5,00,000 जप'}
   }
@@ -296,7 +308,8 @@ function langBar() {
 function render() {
   if (screen === 'loading') { app.innerHTML = `${langBar()}<div class="spinner">${t('loading')}</div>`; return; }
   if (screen === 'auth') { renderAuth(); return; }
-  if (screen === 'auth-sent') { renderAuthSent(); return; }
+  if (screen === 'auth-register') { renderRegister(); return; }
+  if (screen === 'auth-reset') { renderReset(); return; }
   if (screen === 'setup') { renderSetup(); return; }
   if (screen === 'main') { renderMain(); return; }
   if (screen === 'help') { renderHelp(); return; }
@@ -316,15 +329,56 @@ function renderAuth() {
   document.getElementById('inp-email').addEventListener('keydown', e => { if (e.key === 'Enter') sendMagicLink(); });
 }
 
-function renderAuthSent() {
+function authErr(id, msg) {
+  const el = document.getElementById(id);
+  if (el) { el.style.display = ''; el.textContent = msg; }
+}
+function authErrHide(id) {
+  const el = document.getElementById(id);
+  if (el) el.style.display = 'none';
+}
+
+function renderAuth() {
   app.innerHTML = `${langBar()}
-    <div class="sent-box">
-      <h1 style="margin-bottom:1rem;">${t('sentTitle')}</h1>
-      <p>${t('sentText', { email: `<span class="sent-email">${sentEmail}</span>` })}</p>
-      <p style="margin-top:.75rem;font-size:13px;color:var(--txt2);">${t('sentNote')}</p>
-      <div class="divider"></div>
-      <button class="btn btn-secondary" style="width:auto;padding:8px 20px;" onclick="screen='auth';render()">${t('backToEmail')}</button>
-    </div>`;
+    <h1 style="margin-bottom:1.5rem;">${t('emailLabel')}</h1>
+    <div class="field"><label>Email</label>
+      <input type="email" id="inp-email" placeholder="${t('emailPh')}" autocomplete="email" /></div>
+    <div class="field" style="margin-bottom:1.5rem;"><label>${t('passwordLabel')}</label>
+      <input type="password" id="inp-pwd" placeholder="${t('passwordPh')}" autocomplete="current-password"
+        onkeydown="if(event.key==='Enter')doSignIn()" /></div>
+    <div id="auth-err" class="warn" style="display:none;margin-bottom:8px;"></div>
+    <button id="btn-signin" class="btn btn-primary" style="margin-bottom:8px;" onclick="doSignIn()">${t('signInBtn')}</button>
+    <button class="btn btn-secondary" style="margin-bottom:8px;" onclick="screen='auth-register';render()">${t('toRegister')}</button>
+    <button class="btn btn-secondary" onclick="screen='auth-reset';render()">${t('forgotPwd')}</button>`;
+  setTimeout(() => document.getElementById('inp-email')?.focus(), 100);
+}
+
+function renderRegister() {
+  app.innerHTML = `${langBar()}
+    <h1 style="margin-bottom:1.5rem;">${t('registerTitle')}</h1>
+    <div class="field"><label>Email</label>
+      <input type="email" id="inp-email" placeholder="${t('emailPh')}" autocomplete="email" /></div>
+    <div class="field"><label>${t('passwordLabel')}</label>
+      <input type="password" id="inp-pwd" placeholder="${t('passwordPh')}" autocomplete="new-password" /></div>
+    <div class="field" style="margin-bottom:1.5rem;"><label>${t('confirmPwdLabel')}</label>
+      <input type="password" id="inp-pwd2" placeholder="${t('confirmPwdPh')}" autocomplete="new-password"
+        onkeydown="if(event.key==='Enter')doRegister()" /></div>
+    <div id="reg-err" class="warn" style="display:none;margin-bottom:8px;"></div>
+    <button id="btn-reg" class="btn btn-primary" style="margin-bottom:8px;" onclick="doRegister()">${t('registerBtn')}</button>
+    <button class="btn btn-secondary" onclick="screen='auth';render()">${t('toSignIn')}</button>`;
+  setTimeout(() => document.getElementById('inp-email')?.focus(), 100);
+}
+
+function renderReset() {
+  app.innerHTML = `${langBar()}
+    <h1 style="margin-bottom:8px;">${t('resetTitle')}</h1>
+    <p style="font-size:14px;color:var(--txt2);margin-bottom:1.5rem;">${t('resetNote')}</p>
+    <div class="field" style="margin-bottom:1.5rem;"><label>Email</label>
+      <input type="email" id="inp-email" placeholder="${t('emailPh')}" autocomplete="email" /></div>
+    <div id="reset-msg" style="display:none;font-size:13px;color:var(--green);margin-bottom:8px;"></div>
+    <button id="btn-reset" class="btn btn-primary" style="margin-bottom:8px;" onclick="doReset()">${t('resetBtn')}</button>
+    <button class="btn btn-secondary" onclick="screen='auth';render()">${t('toSignIn')}</button>`;
+  setTimeout(() => document.getElementById('inp-email')?.focus(), 100);
 }
 
 function renderSetup() {
@@ -449,13 +503,50 @@ function renderHelp() {
 }
 
 // ── ACTIONS ───────────────────────────────────────────────
-async function sendMagicLink() {
+async function doSignIn() {
+  const email = (document.getElementById('inp-email')?.value || '').trim();
+  const pwd = document.getElementById('inp-pwd')?.value || '';
+  if (!email || !pwd) return;
+  const btn = document.getElementById('btn-signin');
+  if (btn) { btn.disabled = true; btn.textContent = '…'; }
+  authErrHide('auth-err');
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pwd });
+  if (error) {
+    authErr('auth-err', t('authErrWrong'));
+    if (btn) { btn.disabled = false; btn.textContent = t('signInBtn'); }
+    return;
+  }
+  await handleSession(data.session);
+}
+
+async function doRegister() {
+  const email = (document.getElementById('inp-email')?.value || '').trim();
+  const pwd = document.getElementById('inp-pwd')?.value || '';
+  const pwd2 = document.getElementById('inp-pwd2')?.value || '';
+  if (!email || !pwd) return;
+  if (pwd.length < 6) { authErr('reg-err', t('authErrShort')); return; }
+  if (pwd !== pwd2) { authErr('reg-err', t('authErrMismatch')); return; }
+  const btn = document.getElementById('btn-reg');
+  if (btn) { btn.disabled = true; btn.textContent = '…'; }
+  authErrHide('reg-err');
+  const { data, error } = await sb.auth.signUp({ email, password: pwd });
+  if (error) {
+    authErr('reg-err', error.message?.includes('already') ? t('authErrExists') : error.message);
+    if (btn) { btn.disabled = false; btn.textContent = t('registerBtn'); }
+    return;
+  }
+  await handleSession(data.session);
+}
+
+async function doReset() {
   const email = (document.getElementById('inp-email')?.value || '').trim();
   if (!email) return;
-  sentEmail = email;
-  screen = 'auth-sent';
-  render();
-  await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: SITE_URL } });
+  const btn = document.getElementById('btn-reset');
+  if (btn) { btn.disabled = true; btn.textContent = '…'; }
+  await sb.auth.resetPasswordForEmail(email, { redirectTo: SITE_URL });
+  const msg = document.getElementById('reset-msg');
+  if (msg) { msg.style.display = ''; msg.textContent = t('resetSent'); }
+  if (btn) { btn.disabled = false; btn.textContent = t('resetBtn'); }
 }
 
 async function createProfileAction() {
