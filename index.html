@@ -507,26 +507,18 @@ async function doSignIn() {
   if (!email || !pwd) return;
 
   const btn = document.getElementById('btn-signin');
-  if (btn) {
-    btn.disabled = true;
-    btn.textContent = '…';
-  }
+  if (btn) { btn.disabled = true; btn.textContent = '…'; }
   authErrHide('auth-err');
 
-  const { data, error } = await sb.auth.signInWithPassword({
-    email,
-    password: pwd
-  });
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pwd });
   console.log('signIn result', { data, error });
 
   if (error) {
     authErr('auth-err', t('authErrWrong'));
-    if (btn) {
-      btn.disabled = false;
-      btn.textContent = t('signInBtn');
-    }
+    if (btn) { btn.disabled = false; btn.textContent = t('signInBtn'); }
     return;
   }
+}
 
   await handleSession(data.session);
 }
@@ -763,11 +755,14 @@ async function handleSession(session) {
   screen = 'loading'; render();
 
   // Watch for auth changes (sign in via magic link, sign out)
-  sb.auth.onAuthStateChange(async (event, session) => {
+  sb.auth.onAuthStateChange((event, session) => {
   console.log('auth state change', event, session);
   if (settingUp) return;
   if (event === 'INITIAL_SESSION') return;
-  await handleSession(session);
+
+  setTimeout(() => {
+    handleSession(session);
+  }, 0);
 });
 
   // Initial session check — more reliable than waiting for onAuthStateChange
