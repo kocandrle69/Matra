@@ -507,17 +507,28 @@ async function doSignIn() {
   if (!email || !pwd) return;
 
   const btn = document.getElementById('btn-signin');
-  if (btn) { btn.disabled = true; btn.textContent = '…'; }
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = '…';
+  }
   authErrHide('auth-err');
 
-  const { data, error } = await sb.auth.signInWithPassword({ email, password: pwd });
+  const { data, error } = await sb.auth.signInWithPassword({
+    email,
+    password: pwd
+  });
   console.log('signIn result', { data, error });
 
   if (error) {
     authErr('auth-err', t('authErrWrong'));
-    if (btn) { btn.disabled = false; btn.textContent = t('signInBtn'); }
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = t('signInBtn');
+    }
     return;
   }
+
+  await handleSession(data.session);
 }
 
   await handleSession(data.session);
