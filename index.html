@@ -508,18 +508,39 @@ async function doSignOut() {
 }
 
 // ── INIT ──────────────────────────────────────────────────
-(async function init() {
-  screen = 'loading'; render();
-
-  sb.auth.onAuthStateChange(async (event, session) => {
-    if (settingUp) return;
-    if (!session) { screen = 'auth'; render(); return; }
-    const user = session.user;
+async function handleSession(session) {
+  if (!session) { screen = 'auth'; render(); return; }
+  const user = session.user;
+  try {
     profile = await loadProfile(user.id);
     if (!profile) { screen = 'setup'; render(); return; }
     sessions = await loadSessions(user.id);
     screen = 'main'; render();
+  } catch (e) {
+    console.error('handleSession error:', e);
+    screen = 'auth'; render();
+  }
+}
+
+(async function init() {
+  screen = 'loading'; render();
+
+  // Watch for auth changes (sign in via magic link, sign out)
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if (settingUp) return;
+    if (event === 'INITIAL_SESSION') return; // handled by getSession() below
+    await handleSession(session);
   });
+
+  // Initial session check — more reliable than waiting for onAuthStateChange
+  try {
+    const { data: { session }, error } = await sb.auth.getSession();
+    if (error) throw error;
+    await handleSession(session);
+  } catch (e) {
+    console.error('Init error:', e);
+    screen = 'auth'; render();
+  }
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/Matra/sw.js').catch(() => {});
