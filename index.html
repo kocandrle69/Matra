@@ -1,1 +1,492 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Mantra tracker</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="theme-color" content="#1E1208">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#1E1208;--surf:#2A1A0D;--surf2:#352011;
+  --bdr:#4A2E14;--bdr2:#3A2010;
+  --txt:#F2DFC8;--txt2:#9E7A58;--txt3:#4E3020;
+  --green:#6BAE5E;--amber:#D4880C;--red:#C04040;--info:#5888BB;
+  --r:12px;--rs:8px;
+}
+body{background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,'Segoe UI',sans-serif;min-height:100dvh;padding:env(safe-area-inset-top,0) env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0)}
+#app{max-width:480px;margin:0 auto;padding:1rem 1rem 3rem}
+h1{font-size:20px;font-weight:600;margin-bottom:4px}
+.sub{font-size:13px;color:var(--txt2);margin-bottom:1.5rem}
+.card{background:var(--surf);border:0.5px solid var(--bdr);border-radius:var(--r);padding:1rem 1.1rem;margin-bottom:10px}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.stat{background:var(--surf);border-radius:var(--rs);padding:.9rem 1rem}
+.stat-label{font-size:11px;color:var(--txt2);margin-bottom:4px}
+.stat-val{font-size:20px;font-weight:600;line-height:1.2}
+.stat-sub{font-size:11px;color:var(--txt3);margin-top:3px}
+.bar-row{margin-bottom:16px}
+.bar-row:last-child{margin-bottom:0}
+.bar-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.bar-name{font-size:13px;color:var(--txt2)}
+.bar-info{font-size:11px;color:var(--txt3)}
+.bar-track{height:8px;background:var(--bdr2);border-radius:4px;overflow:hidden;position:relative}
+.bar-fill{height:100%;border-radius:4px;transition:width .4s}
+.bar-marker{position:absolute;top:0;height:100%;width:2px;background:var(--red)}
+.bar-maxlabel{text-align:right;font-size:10px;color:var(--txt3);margin-top:3px}
+.info-box{border-radius:var(--rs);padding:10px 14px;font-size:13px;line-height:1.5;margin-bottom:12px}
+.info-box.info{background:#1a2e40;color:#82b4db;border:0.5px solid #2a4a66}
+.info-box.danger{background:#3a1515;color:#d08080;border:0.5px solid #5a2020}
+.info-box.success{background:#152a15;color:#7ab87a;border:0.5px solid #2a4a2a}
+label{display:block;font-size:12px;color:var(--txt2);margin-bottom:5px}
+input,select{width:100%;background:var(--bg);border:0.5px solid var(--bdr);border-radius:var(--rs);color:var(--txt);font-size:15px;padding:10px 12px;outline:none;-webkit-appearance:none;appearance:none}
+input:focus,select:focus{border-color:var(--amber)}
+select option{background:var(--surf)}
+.field{margin-bottom:14px}
+.btn{width:100%;padding:12px;border:none;border-radius:var(--rs);font-size:15px;font-weight:600;cursor:pointer;transition:opacity .15s}
+.btn:active{opacity:.8}
+.btn-primary{background:var(--amber);color:var(--bg)}
+.btn-secondary{background:var(--surf2);color:var(--txt2);border:0.5px solid var(--bdr)}
+.btn-row{display:flex;gap:8px}
+.btn-row .btn-secondary{flex:1}
+.btn-row .btn-primary{flex:2}
+.top-bar{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.2rem}
+.top-bar-right{display:flex;gap:6px;align-items:center;flex-shrink:0}
+.icon-btn{width:32px;height:32px;border-radius:50%;background:var(--surf);border:0.5px solid var(--bdr);color:var(--txt2);font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.text-btn{background:var(--surf);border:0.5px solid var(--bdr);color:var(--txt2);font-size:12px;padding:6px 12px;border-radius:20px;cursor:pointer;white-space:nowrap}
+.lang-bar{display:flex;justify-content:flex-end;gap:4px;margin-bottom:1rem}
+.lang-btn{background:var(--surf);border:0.5px solid var(--bdr);color:var(--txt2);font-size:12px;padding:4px 10px;border-radius:20px;cursor:pointer}
+.lang-btn.active{border-color:var(--amber);color:var(--amber);font-weight:600}
+.session-list-item{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:0.5px solid var(--bdr2)}
+.session-list-item:last-child{border-bottom:none}
+.sess-date{font-size:13px;color:var(--txt2)}
+.sess-note{font-size:11px;color:var(--txt3);margin-left:8px}
+.sess-malas{font-size:14px;font-weight:600}
+.sess-ag{font-size:12px;color:var(--amber);margin-left:8px}
+.warn{font-size:12px;color:var(--red);margin-bottom:8px;line-height:1.5}
+.section-label{font-size:12px;color:var(--txt2);margin-bottom:8px}
+.help-section{background:var(--surf);border:0.5px solid var(--bdr);border-radius:var(--r);padding:1rem;margin-bottom:10px}
+.help-section h3{font-size:14px;font-weight:600;margin-bottom:6px}
+.help-section p{font-size:13px;color:var(--txt2);line-height:1.6}
+.spinner{text-align:center;padding:3rem 0;color:var(--txt3)}
+.sent-box{text-align:center;padding:2rem 0}
+.sent-box p{color:var(--txt2);font-size:14px;line-height:1.7}
+.sent-email{color:var(--amber);font-weight:600}
+.divider{height:0.5px;background:var(--bdr2);margin:1.5rem 0}
+.sign-out{font-size:12px;color:var(--txt3);cursor:pointer;text-decoration:underline;text-align:center;margin-top:1rem}
+</style>
+</head>
+<body>
+<div id="app"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ── CONFIG ────────────────────────────────────────────────
+const SUPABASE_URL = 'https://vrqrwujuevrwjkuqxnjt.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZycXJ3dWp1ZXZyd2prdXF4bmp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNzE1NjQsImV4cCI6MjA5MTk0NzU2NH0.3pCDPbkKvtuUxNPTynarA-s8elt1pGgNaMAKrA10U38';
+const SITE_URL = 'https://kocandrle69.github.io/Matra/';
+
+// ── LEVELS ────────────────────────────────────────────────
+const LEVELS = {
+  '0':{reps:125000,malas:1158,agiyariTarget:116},
+  '1':{reps:250000,malas:2315,agiyariTarget:232},
+  '2':{reps:600000,malas:5556,agiyariTarget:556},
+  '3':{reps:600000,malas:5556,agiyariTarget:556},
+  '4':{reps:250000,malas:2315,agiyariTarget:232},
+  '5':{reps:500000,malas:4630,agiyariTarget:463}
+};
+
+// ── TRANSLATIONS ──────────────────────────────────────────
+const TR = {
+  cs:{
+    appTitle:'Mantra tracker',loading:'Načítání…',
+    emailLabel:'Přihlásit se přes e-mail',emailPh:'tvuj@email.cz',
+    sendLink:'Odeslat přihlašovací odkaz',
+    sentTitle:'Odkaz odeslán',
+    sentText:'Zkontroluj e-mail na adrese {email} a klikni na přihlašovací odkaz.',
+    sentNote:'Odkaz platí 1 hodinu. Po kliknutí se vrátíš sem automaticky.',
+    backToEmail:'Zadat jiný e-mail',
+    setupTitle:'Nastavení profilu',nameLabel:'Jméno',namePh:'Tvoje jméno',
+    levelLabel:'Level',startMalasLabel:'Již odříkáno mál (pokud začínáš se stavem)',
+    startAgiyariLabel:'Z toho při agiyari',createProfile:'Uložit a začít',
+    switchUser:'Jiný uživatel',signOut:'Odhlásit se',
+    totalReps:'Opakování celkem',remaining:'zbývá',
+    agiyariMalasLabel:'Agiyari mály',mantras:'Mantry',agiyari:'Agiyari',
+    maxNow:'max. nyní:',malasUnit:'mál',
+    addSession:'Přidat sezení',malaCount:'Počet mál',
+    agiyariCount:'Z toho agiyari',save:'Zapsat',
+    recentSessions:'Poslední sezení',noSessions:'Zatím žádná sezení.',
+    initialState:'Počáteční stav',
+    agiyariDone:'Agiyari dokončeno! Zbývají pouze mantry.',
+    agiyariBlocked:'Agiyari v tuto chvíli není možné. Počet mál při agiyari nesmí přesáhnout 10 % aktuálně provedeného počtu opakování.',
+    agiyariInfo:'Počet mál při agiyari nesmí přesáhnout 10 % aktuálně provedeného počtu opakování. Nyní lze přidat max {n} mál.',
+    warnSession:'Agiyari nemůže přesáhnout celkový počet mál v sezení.',
+    warn10:'Počet mál při agiyari nesmí přesáhnout 10 % aktuálně provedeného počtu opakování. Nyní lze přidat max {n} mál.',
+    helpTitle:'Nápověda',helpClose:'Zavřít',
+    h1t:'Pravidlo agiyari',h1b:'Počet mál odříkaných při agiyari nesmí v žádném okamžiku přesáhnout 10 % celkového počtu dosud provedených opakování. Červená čára na baru agiyari ukazuje aktuální maximum.',
+    h2t:'Jak se počítají opakování',h2b:'Mála má 108 kuliček (+ 1 gurukulička). Jedno kolo máły = 108 opakování mantry. Do trackeru vždy zadáváš počet mál — opakování se počítají automaticky (mály × 108). Cílový počet opakování je vyjádřen přímo (např. 250 000), ale sledovat stačí mály.',
+    h3t:'Jak to funguje',h3b:'Po dokončení cílového počtu opakování je třeba dokončit také agiyari (10 % z celkového cíle). Až poté lze u gurua požádat o postup do dalšího levelu.',
+    h4t:'Přidat aplikaci na plochu',h4b:'Android (Chrome): tečky vpravo nahoře → Přidat na úvodní obrazovku. iOS (Safari): tlačítko sdílení → Přidat na plochu. PC (Chrome): ikona instalace v adresním řádku nebo Menu → Nainstalovat aplikaci. Po přidání se otevírá bez panelu prohlížeče jako klasická appka.',
+    h5t:'Přihlášení',h5b:'Přihlašuješ se přes odkaz zaslaný na e-mail — žádné heslo. Na stejném zařízení a prohlížeči zůstaneš přihlášen automaticky. Na novém zařízení stačí zadat e-mail znovu.',
+    levelNames:{'0':'Mantra Deeksha Level 0','1':'Tantra Deeksha Level 1','2':'Tantra Deeksha Level 2','3':'Tantra Deeksha Level 3','4':'Tantra Deeksha Level 4','5':'Tantra Deeksha Level 5'},
+    levelOpts:{'0':'Mantra Deeksha Level 0 — 125 000 opakování','1':'Tantra Deeksha Level 1 — 250 000 opakování','2':'Tantra Deeksha Level 2 — 600 000 opakování','3':'Tantra Deeksha Level 3 — 600 000 opakování','4':'Tantra Deeksha Level 4 — 250 000 opakování','5':'Tantra Deeksha Level 5 — 500 000 opakování'}
+  },
+  en:{
+    appTitle:'Mantra tracker',loading:'Loading…',
+    emailLabel:'Sign in with email',emailPh:'your@email.com',
+    sendLink:'Send sign-in link',
+    sentTitle:'Link sent',
+    sentText:'Check your email at {email} and click the sign-in link.',
+    sentNote:'The link is valid for 1 hour. After clicking it you will return here automatically.',
+    backToEmail:'Use a different email',
+    setupTitle:'Profile setup',nameLabel:'Name',namePh:'Your name',
+    levelLabel:'Level',startMalasLabel:'Mālas already completed (if starting with existing progress)',
+    startAgiyariLabel:'Of which at agiyari',createProfile:'Save and start',
+    switchUser:'Switch user',signOut:'Sign out',
+    totalReps:'Total repetitions',remaining:'remaining',
+    agiyariMalasLabel:'Agiyari mālas',mantras:'Mantras',agiyari:'Agiyari',
+    maxNow:'max. now:',malasUnit:'mālas',
+    addSession:'Add session',malaCount:'Number of mālas',
+    agiyariCount:'Of which agiyari',save:'Save',
+    recentSessions:'Recent sessions',noSessions:'No sessions yet.',
+    initialState:'Initial state',
+    agiyariDone:'Agiyari complete! Only mantras remaining.',
+    agiyariBlocked:'Agiyari is not possible right now. The number of mālas at agiyari must not exceed 10% of the total repetitions completed so far.',
+    agiyariInfo:'The number of mālas at agiyari must not exceed 10% of the total repetitions completed so far. You can add max {n} mālas now.',
+    warnSession:'Agiyari mālas cannot exceed the total mālas in this session.',
+    warn10:'The number of mālas at agiyari must not exceed 10% of the total repetitions completed so far. You can add max {n} mālas now.',
+    helpTitle:'Help',helpClose:'Close',
+    h1t:'Agiyari rule',h1b:'The number of mālas recited at agiyari must not at any point exceed 10% of the total repetitions completed so far. The red line on the agiyari bar shows the current maximum.',
+    h2t:'How repetitions are counted',h2b:'A mālā has 108 beads (+ 1 guru bead). One round = 108 repetitions of the mantra. You always enter the number of mālas — repetitions are calculated automatically (mālas × 108). The target is expressed in repetitions (e.g. 250,000) but tracking mālas is all you need.',
+    h3t:'How it works',h3b:'After completing the target number of repetitions, the agiyari portion (10% of total goal) must also be completed before requesting advancement to the next level from the Guru.',
+    h4t:'Add app to home screen',h4b:'Android (Chrome): three dots top right → Add to Home screen. iOS (Safari): share button → Add to Home Screen. PC (Chrome): install icon in address bar or Menu → Install app. Once added it opens without the browser bar, just like a regular app.',
+    h5t:'Login',h5b:'You sign in via a link sent to your email — no password needed. On the same device and browser you will stay logged in automatically. On a new device, just enter your email again.',
+    levelNames:{'0':'Mantra Deeksha Level 0','1':'Tantra Deeksha Level 1','2':'Tantra Deeksha Level 2','3':'Tantra Deeksha Level 3','4':'Tantra Deeksha Level 4','5':'Tantra Deeksha Level 5'},
+    levelOpts:{'0':'Mantra Deeksha Level 0 — 125,000 repetitions','1':'Tantra Deeksha Level 1 — 250,000 repetitions','2':'Tantra Deeksha Level 2 — 600,000 repetitions','3':'Tantra Deeksha Level 3 — 600,000 repetitions','4':'Tantra Deeksha Level 4 — 250,000 repetitions','5':'Tantra Deeksha Level 5 — 500,000 repetitions'}
+  },
+  hi:{
+    appTitle:'मंत्र ट्रैकर',loading:'लोड हो रहा है…',
+    emailLabel:'ईमेल से लॉगिन करें',emailPh:'aapka@email.com',
+    sendLink:'लॉगिन लिंक भेजें',
+    sentTitle:'लिंक भेज दिया गया',
+    sentText:'{email} पर आए ईमेल में लॉगिन लिंक पर क्लिक करें।',
+    sentNote:'लिंक 1 घंटे के लिए वैध है। क्लिक करने के बाद आप यहाँ वापस आ जाएंगे।',
+    backToEmail:'अलग ईमेल दर्ज करें',
+    setupTitle:'प्रोफ़ाइल सेटअप',nameLabel:'नाम',namePh:'आपका नाम',
+    levelLabel:'लेवल',startMalasLabel:'पहले से पूर्ण मालाओं की संख्या',
+    startAgiyariLabel:'जिनमें से अगियारी में',createProfile:'सहेजें और शुरू करें',
+    switchUser:'उपयोगकर्ता बदलें',signOut:'लॉगआउट',
+    totalReps:'कुल जप',remaining:'शेष',
+    agiyariMalasLabel:'अगियारी मालाएं',mantras:'मंत्र',agiyari:'अगियारी',
+    maxNow:'अभी अधिकतम:',malasUnit:'मालाएं',
+    addSession:'सत्र जोड़ें',malaCount:'मालाओं की संख्या',
+    agiyariCount:'जिनमें से अगियारी',save:'सहेजें',
+    recentSessions:'हाल के सत्र',noSessions:'अभी तक कोई सत्र नहीं।',
+    initialState:'प्रारंभिक स्थिति',
+    agiyariDone:'अगियारी पूर्ण! केवल मंत्र शेष हैं।',
+    agiyariBlocked:'इस समय अगियारी संभव नहीं। अगियारी में मालाओं की संख्या अब तक के कुल जप के 10% से अधिक नहीं हो सकती।',
+    agiyariInfo:'अगियारी में मालाओं की संख्या अब तक के कुल जप के 10% से अधिक नहीं हो सकती। अभी अधिकतम {n} मालाएं जोड़ी जा सकती हैं।',
+    warnSession:'अगियारी मालाएं सत्र की कुल मालाओं से अधिक नहीं हो सकतीं।',
+    warn10:'अगियारी में मालाओं की संख्या अब तक के कुल जप के 10% से अधिक नहीं हो सकती। अभी अधिकतम {n} मालाएं जोड़ी जा सकती हैं।',
+    helpTitle:'सहायता',helpClose:'बंद करें',
+    h1t:'अगियारी नियम',h1b:'अगियारी में की गई मालाओं की संख्या किसी भी समय अब तक के कुल जप के 10% से अधिक नहीं होनी चाहिए। अगियारी बार पर लाल रेखा वर्तमान अधिकतम सीमा दर्शाती है।',
+    h2t:'जप की गणना कैसे होती है',h2b:'एक माला में 108 मनके होते हैं (+ 1 गुरु मनका)। एक माला का चक्कर = 108 जप। आप हमेशा मालाओं की संख्या दर्ज करते हैं — जप स्वचालित रूप से गणना होती है (मालाएं × 108)। लक्ष्य जप में व्यक्त है, लेकिन मालाएं ट्रैक करना ही पर्याप्त है।',
+    h3t:'यह कैसे काम करता है',h3b:'लक्ष्य जप संख्या पूर्ण होने के बाद, अगियारी भाग (कुल लक्ष्य का 10%) भी पूरा करना आवश्यक है। उसके बाद ही गुरु से अगले लेवल के लिए निवेदन किया जा सकता है।',
+    h4t:'ऐप को होम स्क्रीन पर जोड़ें',h4b:'Android (Chrome): ऊपर दाईं ओर तीन बिंदु → होम स्क्रीन पर जोड़ें। iOS (Safari): शेयर बटन → होम स्क्रीन पर जोड़ें। PC (Chrome): एड्रेस बार में इंस्टॉल आइकन या मेनू → ऐप इंस्टॉल करें। जोड़ने के बाद ऐप बिना ब्राउज़र बार के खुलता है।',
+    h5t:'लॉगिन',h5b:'आप ईमेल पर भेजे गए लिंक से लॉगिन करते हैं — कोई पासवर्ड नहीं। एक ही डिवाइस और ब्राउज़र पर आप अपने आप लॉगिन रहेंगे। नए डिवाइस पर दोबारा ईमेल दर्ज करें।',
+    levelNames:{'0':'मंत्र दीक्षा लेवल 0','1':'तंत्र दीक्षा लेवल 1','2':'तंत्र दीक्षा लेवल 2','3':'तंत्र दीक्षा लेवल 3','4':'तंत्र दीक्षा लेवल 4','5':'तंत्र दीक्षा लेवल 5'},
+    levelOpts:{'0':'मंत्र दीक्षा लेवल 0 — 1,25,000 जप','1':'तंत्र दीक्षा लेवल 1 — 2,50,000 जप','2':'तंत्र दीक्षा लेवल 2 — 6,00,000 जप','3':'तंत्र दीक्षा लेवल 3 — 6,00,000 जप','4':'तंत्र दीक्षा लेवल 4 — 2,50,000 जप','5':'तंत्र दीक्षा लेवल 5 — 5,00,000 जप'}
+  }
+};
+
+// ── STATE ─────────────────────────────────────────────────
+let lang = localStorage.getItem('mt_lang') || 'cs';
+let screen = 'loading';
+let profile = null;
+let sessions = [];
+let prevScreen = 'main';
+
+// ── SUPABASE ──────────────────────────────────────────────
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ── HELPERS ───────────────────────────────────────────────
+const app = document.getElementById('app');
+function t(k, v = {}) {
+  const tx = TR[lang] || TR.cs;
+  let s = tx[k] !== undefined ? tx[k] : (TR.cs[k] || k);
+  if (typeof s === 'object') return s;
+  Object.entries(v).forEach(([a, b]) => { s = s.replace('{' + a + '}', b); });
+  return s;
+}
+function fmt(n) {
+  const r = Math.round(n);
+  if (lang === 'hi') return r.toLocaleString('hi-IN');
+  if (lang === 'en') return r.toLocaleString('en-US');
+  return r.toLocaleString('cs-CZ');
+}
+function today() { return new Date().toISOString().slice(0, 10); }
+function computeStats() {
+  const lv = LEVELS[profile?.level] || LEVELS['0'];
+  const totalMalas = sessions.reduce((s, x) => s + (x.malas || 0), 0);
+  const totalAgiyari = sessions.reduce((s, x) => s + (x.agiyari_malas || 0), 0);
+  return { totalMalas, totalAgiyari, targetMalas: lv.malas, targetAgiyari: lv.agiyariTarget, maxAllowed: Math.floor(totalMalas * 0.1), lv };
+}
+function setLang(l) {
+  lang = l;
+  localStorage.setItem('mt_lang', l);
+  render();
+}
+
+// ── SUPABASE OPS ──────────────────────────────────────────
+async function loadProfile(userId) {
+  const { data } = await sb.from('profiles').select('*').eq('id', userId).single();
+  return data;
+}
+async function loadSessions(userId) {
+  const { data } = await sb.from('sessions').select('*').eq('user_id', userId).order('created_at', { ascending: false });
+  return data || [];
+}
+async function saveProfile(userId, name, level) {
+  const { data } = await sb.from('profiles').insert({ id: userId, name, level }).select().single();
+  return data;
+}
+async function addSessionDB(userId, malas, agiyariMalas, note) {
+  const { data } = await sb.from('sessions').insert({
+    user_id: userId, date: today(), malas, agiyari_malas: agiyariMalas, note: note || null
+  }).select().single();
+  return data;
+}
+
+// ── RENDER ────────────────────────────────────────────────
+function langBar() {
+  return `<div class="lang-bar">
+    ${['cs','en','hi'].map(l => `<button class="lang-btn${lang===l?' active':''}" onclick="setLang('${l}')">${l.toUpperCase()}</button>`).join('')}
+  </div>`;
+}
+
+function render() {
+  if (screen === 'loading') { app.innerHTML = `${langBar()}<div class="spinner">${t('loading')}</div>`; return; }
+  if (screen === 'auth') { renderAuth(); return; }
+  if (screen === 'auth-sent') { renderAuthSent(); return; }
+  if (screen === 'setup') { renderSetup(); return; }
+  if (screen === 'main') { renderMain(); return; }
+  if (screen === 'help') { renderHelp(); return; }
+}
+
+let sentEmail = '';
+function renderAuth() {
+  app.innerHTML = `${langBar()}
+    <h1>${t('appTitle')}</h1>
+    <p class="sub" style="margin-bottom:2rem;">&nbsp;</p>
+    <div class="field">
+      <label>${t('emailLabel')}</label>
+      <input type="email" id="inp-email" placeholder="${t('emailPh')}" autocomplete="email" />
+    </div>
+    <button class="btn btn-primary" onclick="sendMagicLink()">${t('sendLink')}</button>`;
+  document.getElementById('inp-email').addEventListener('keydown', e => { if (e.key === 'Enter') sendMagicLink(); });
+}
+
+function renderAuthSent() {
+  app.innerHTML = `${langBar()}
+    <div class="sent-box">
+      <h1 style="margin-bottom:1rem;">${t('sentTitle')}</h1>
+      <p>${t('sentText', { email: `<span class="sent-email">${sentEmail}</span>` })}</p>
+      <p style="margin-top:.75rem;font-size:13px;color:var(--txt3);">${t('sentNote')}</p>
+      <div class="divider"></div>
+      <button class="btn btn-secondary" style="width:auto;padding:8px 20px;" onclick="screen='auth';render()">${t('backToEmail')}</button>
+    </div>`;
+}
+
+function renderSetup() {
+  const opts = t('levelOpts');
+  const optHtml = Object.entries(opts).map(([k, v]) => `<option value="${k}">${v}</option>`).join('');
+  app.innerHTML = `${langBar()}
+    <h1>${t('setupTitle')}</h1>
+    <div class="divider"></div>
+    <div class="field"><label>${t('nameLabel')}</label><input type="text" id="inp-name" placeholder="${t('namePh')}" /></div>
+    <div class="field"><label>${t('levelLabel')}</label><select id="inp-level">${optHtml}</select></div>
+    <div class="field"><label>${t('startMalasLabel')}</label><input type="number" id="inp-sm" value="0" min="0" /></div>
+    <div class="field" style="margin-bottom:2rem;"><label>${t('startAgiyariLabel')}</label><input type="number" id="inp-sa" value="0" min="0" /></div>
+    <button class="btn btn-primary" onclick="createProfileAction()">${t('createProfile')}</button>`;
+}
+
+function renderMain() {
+  const { totalMalas, totalAgiyari, targetMalas, targetAgiyari, maxAllowed, lv } = computeStats();
+  const lvNames = t('levelNames');
+  const totalReps = totalMalas * 108;
+  const mPct = Math.min(100, Math.round(totalMalas / targetMalas * 100));
+  const aPct = Math.min(100, Math.round(totalAgiyari / targetAgiyari * 100));
+  const showMarker = maxAllowed < targetAgiyari;
+  const markerPct = showMarker ? Math.min(99, Math.round(maxAllowed / targetAgiyari * 100)) : 0;
+  const canAdd = maxAllowed - totalAgiyari;
+  const remainAg = targetAgiyari - totalAgiyari;
+
+  let infoHtml = '';
+  if (remainAg <= 0) {
+    infoHtml = `<div class="info-box success">${t('agiyariDone')}</div>`;
+  } else if (canAdd <= 0 && totalMalas > 0) {
+    infoHtml = `<div class="info-box danger">${t('agiyariBlocked')}</div>`;
+  } else if (totalMalas > 0) {
+    infoHtml = `<div class="info-box info">${t('agiyariInfo', { n: fmt(canAdd) })}</div>`;
+  }
+
+  const recent = sessions.slice(0, 12);
+  const sessHtml = recent.length === 0
+    ? `<p style="font-size:13px;color:var(--txt3);">${t('noSessions')}</p>`
+    : recent.map(s => `
+      <div class="session-list-item">
+        <div><span class="sess-date">${s.date}</span>${s.note ? `<span class="sess-note">${s.note}</span>` : ''}</div>
+        <div style="text-align:right;">
+          <span class="sess-malas">${fmt(s.malas)} ${t('malasUnit')}</span>
+          ${s.agiyari_malas > 0 ? `<span class="sess-ag">agiyari: ${fmt(s.agiyari_malas)}</span>` : ''}
+        </div>
+      </div>`).join('');
+
+  app.innerHTML = `${langBar()}
+    <div class="top-bar">
+      <div><div style="font-size:17px;font-weight:600;">${profile?.name || ''}</div>
+      <div style="font-size:12px;color:var(--txt2);">${lvNames[profile?.level] || ''}</div></div>
+      <div class="top-bar-right">
+        <button class="icon-btn" onclick="prevScreen='main';screen='help';render()">?</button>
+        <button class="text-btn" onclick="screen='main';doSignOut()">${t('signOut')}</button>
+      </div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat">
+        <div class="stat-label">${t('totalReps')}</div>
+        <div class="stat-val">${fmt(totalReps)}</div>
+        <div class="stat-sub">${t('remaining')} ${fmt(Math.max(0, lv.reps - totalReps))}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">${t('agiyariMalasLabel')}</div>
+        <div class="stat-val">${fmt(totalAgiyari)} ${t('malasUnit')}</div>
+        <div class="stat-sub">${t('remaining')} ${fmt(Math.max(0, remainAg))} ${t('malasUnit')}</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="bar-row">
+        <div class="bar-head"><span class="bar-name">${t('mantras')}</span><span class="bar-info">${fmt(totalMalas)} / ${fmt(targetMalas)} ${t('malasUnit')} · ${mPct} %</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:${mPct}%;background:var(--green);"></div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-head"><span class="bar-name">${t('agiyari')}</span><span class="bar-info">${fmt(totalAgiyari)} / ${fmt(targetAgiyari)} ${t('malasUnit')} · ${aPct} %</span></div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:${aPct}%;background:var(--amber);"></div>
+          ${showMarker ? `<div class="bar-marker" style="left:${markerPct}%;"></div>` : ''}
+        </div>
+        <div class="bar-maxlabel">${showMarker ? `| ${t('maxNow')} ${fmt(maxAllowed)} ${t('malasUnit')}` : '&nbsp;'}</div>
+      </div>
+    </div>
+
+    ${infoHtml}
+
+    <div class="card">
+      <div style="font-size:13px;font-weight:600;margin-bottom:12px;">${t('addSession')}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+        <div><label>${t('malaCount')}</label><input type="number" id="inp-malas" min="0" placeholder="0" oninput="validateSession()" /></div>
+        <div><label>${t('agiyariCount')}</label><input type="number" id="inp-ag" min="0" placeholder="0" oninput="validateSession()" /></div>
+      </div>
+      <div id="session-warn" class="warn" style="display:none;"></div>
+      <button id="btn-log" class="btn btn-primary" onclick="logSession()">${t('save')}</button>
+    </div>
+
+    <div class="section-label">${t('recentSessions')}</div>
+    <div class="card" style="padding:0 1.1rem;">${sessHtml}</div>`;
+}
+
+function renderHelp() {
+  const sections = ['h1','h2','h3','h4','h5'].map(k =>
+    `<div class="help-section"><h3>${t(k+'t')}</h3><p>${t(k+'b')}</p></div>`
+  ).join('');
+  app.innerHTML = `${langBar()}
+    <div class="top-bar" style="margin-bottom:1.5rem;">
+      <h1>${t('helpTitle')}</h1>
+      <button class="text-btn" onclick="screen='main';render()">${t('helpClose')}</button>
+    </div>
+    ${sections}`;
+}
+
+// ── ACTIONS ───────────────────────────────────────────────
+async function sendMagicLink() {
+  const email = (document.getElementById('inp-email')?.value || '').trim();
+  if (!email) return;
+  sentEmail = email;
+  screen = 'auth-sent';
+  render();
+  await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: SITE_URL } });
+}
+
+async function createProfileAction() {
+  const name = (document.getElementById('inp-name')?.value || '').trim();
+  if (!name) return;
+  const level = document.getElementById('inp-level')?.value || '0';
+  const sm = Math.max(0, parseInt(document.getElementById('inp-sm')?.value) || 0);
+  const sa = Math.max(0, parseInt(document.getElementById('inp-sa')?.value) || 0);
+  const { data: { user } } = await sb.auth.getUser();
+  profile = await saveProfile(user.id, name, level);
+  if (sm > 0) {
+    await addSessionDB(user.id, sm, sa, t('initialState'));
+    sessions = await loadSessions(user.id);
+  }
+  screen = 'main';
+  render();
+}
+
+function validateSession() {
+  const malas = parseInt(document.getElementById('inp-malas')?.value) || 0;
+  const ag = parseInt(document.getElementById('inp-ag')?.value) || 0;
+  const { totalMalas, totalAgiyari } = computeStats();
+  const w = document.getElementById('session-warn');
+  const btn = document.getElementById('btn-log');
+  if (!w || !btn) return;
+  if (ag > malas) { w.style.display = ''; w.textContent = t('warnSession'); btn.disabled = true; return; }
+  const newMax = Math.floor((totalMalas + malas) * 0.1);
+  if (totalAgiyari + ag > newMax) {
+    const maxAdd = Math.max(0, newMax - totalAgiyari);
+    w.style.display = ''; w.textContent = t('warn10', { n: fmt(maxAdd) }); btn.disabled = true; return;
+  }
+  w.style.display = 'none'; btn.disabled = false;
+}
+
+async function logSession() {
+  const malas = parseInt(document.getElementById('inp-malas')?.value) || 0;
+  const ag = parseInt(document.getElementById('inp-ag')?.value) || 0;
+  if (malas <= 0) return;
+  const { data: { user } } = await sb.auth.getUser();
+  const newSession = await addSessionDB(user.id, malas, ag, null);
+  if (newSession) sessions.unshift(newSession);
+  render();
+}
+
+async function doSignOut() {
+  await sb.auth.signOut();
+  profile = null; sessions = [];
+  screen = 'auth'; render();
+}
+
+// ── INIT ──────────────────────────────────────────────────
+(async function init() {
+  screen = 'loading'; render();
+
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if (!session) { screen = 'auth'; render(); return; }
+    const user = session.user;
+    profile = await loadProfile(user.id);
+    if (!profile) { screen = 'setup'; render(); return; }
+    sessions = await loadSessions(user.id);
+    screen = 'main'; render();
+  });
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/Matra/sw.js').catch(() => {});
+  }
+})();
+</script>
+</body>
+</html>
