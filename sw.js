@@ -1,4 +1,4 @@
-const CACHE = 'mantra-tracker-v1';
+const CACHE = 'mantra-tracker-v2';
 const SHELL = ['/Matra/', '/Matra/index.html', '/Matra/manifest.json'];
 
 self.addEventListener('install', e => {
