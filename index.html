@@ -531,9 +531,6 @@ async function doSignIn() {
   await handleSession(data.session);
 }
 
-  await handleSession(data.session);
-}
-
 async function doRegister() {
   const email = (document.getElementById('inp-email')?.value || '').trim();
   const pwd = document.getElementById('inp-pwd')?.value || '';
