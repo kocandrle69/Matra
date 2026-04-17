@@ -27,16 +27,16 @@ h1{font-size:20px;font-weight:600;margin-bottom:4px}
 .stat{background:var(--surf);border-radius:var(--rs);padding:.9rem 1rem}
 .stat-label{font-size:11px;color:var(--txt2);margin-bottom:4px}
 .stat-val{font-size:20px;font-weight:600;line-height:1.2}
-.stat-sub{font-size:11px;color:var(--txt3);margin-top:3px}
+.stat-sub{font-size:11px;color:var(--txt2);margin-top:3px}
 .bar-row{margin-bottom:16px}
 .bar-row:last-child{margin-bottom:0}
 .bar-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
 .bar-name{font-size:13px;color:var(--txt2)}
-.bar-info{font-size:11px;color:var(--txt3)}
+.bar-info{font-size:11px;color:var(--txt2)}
 .bar-track{height:8px;background:var(--bdr2);border-radius:4px;overflow:hidden;position:relative}
 .bar-fill{height:100%;border-radius:4px;transition:width .4s}
 .bar-marker{position:absolute;top:0;height:100%;width:2px;background:var(--red)}
-.bar-maxlabel{text-align:right;font-size:10px;color:var(--txt3);margin-top:3px}
+.bar-maxlabel{text-align:right;font-size:10px;color:var(--txt2);margin-top:3px}
 .info-box{border-radius:var(--rs);padding:10px 14px;font-size:13px;line-height:1.5;margin-bottom:12px}
 .info-box.info{background:#1a2e40;color:#82b4db;border:0.5px solid #2a4a66}
 .info-box.danger{background:#3a1515;color:#d08080;border:0.5px solid #5a2020}
@@ -63,7 +63,7 @@ select option{background:var(--surf)}
 .session-list-item{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:0.5px solid var(--bdr2)}
 .session-list-item:last-child{border-bottom:none}
 .sess-date{font-size:13px;color:var(--txt2)}
-.sess-note{font-size:11px;color:var(--txt3);margin-left:8px}
+.sess-note{font-size:11px;color:var(--txt2);margin-left:8px}
 .sess-malas{font-size:14px;font-weight:600}
 .sess-ag{font-size:12px;color:var(--amber);margin-left:8px}
 .warn{font-size:12px;color:var(--red);margin-bottom:8px;line-height:1.5}
@@ -71,12 +71,12 @@ select option{background:var(--surf)}
 .help-section{background:var(--surf);border:0.5px solid var(--bdr);border-radius:var(--r);padding:1rem;margin-bottom:10px}
 .help-section h3{font-size:14px;font-weight:600;margin-bottom:6px}
 .help-section p{font-size:13px;color:var(--txt2);line-height:1.6}
-.spinner{text-align:center;padding:3rem 0;color:var(--txt3)}
+.spinner{text-align:center;padding:3rem 0;color:var(--txt2)}
 .sent-box{text-align:center;padding:2rem 0}
 .sent-box p{color:var(--txt2);font-size:14px;line-height:1.7}
 .sent-email{color:var(--amber);font-weight:600}
 .divider{height:0.5px;background:var(--bdr2);margin:1.5rem 0}
-.sign-out{font-size:12px;color:var(--txt3);cursor:pointer;text-decoration:underline;text-align:center;margin-top:1rem}
+.sign-out{font-size:12px;color:var(--txt2);cursor:pointer;text-decoration:underline;text-align:center;margin-top:1rem}
 .type-toggle{display:flex;margin-bottom:12px;border-radius:var(--rs);overflow:hidden;border:0.5px solid var(--bdr)}
 .type-btn{flex:1;padding:10px;background:var(--bg);color:var(--txt2);font-size:13px;cursor:pointer;border:none;transition:background .15s,color .15s}
 .type-btn.active-std{background:var(--surf2);color:var(--txt);font-weight:600}
@@ -416,7 +416,7 @@ function renderMain() {
 
   const recent = sessions.slice(0, 12);
   const sessHtml = recent.length === 0
-    ? `<p style="font-size:13px;color:var(--txt3);">${t('noSessions')}</p>`
+    ? `<p style="font-size:13px;color:var(--txt2);">${t('noSessions')}</p>`
     : recent.map(s => `
       <div class="session-list-item">
         <div>
