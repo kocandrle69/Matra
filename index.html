@@ -276,16 +276,23 @@ function setLang(l) {
 
 // ── SUPABASE OPS ──────────────────────────────────────────
 async function loadProfile(userId) {
+  console.log('loadProfile call', userId);
   const { data, error } = await sb.from('profiles').select('*').eq('id', userId).maybeSingle();
-  if (error) console.error('loadProfile:', error);
+  console.log('loadProfile result', { data, error });
+  if (error) console.error('loadProfile error:', error);
   return data;
 }
 async function loadSessions(userId, level) {
-  const { data } = await sb.from('sessions')
+  console.log('loadSessions call', { userId, level });
+  const { data, error } = await sb.from('sessions')
     .select('*')
     .eq('user_id', userId)
     .eq('level', level)
     .order('created_at', { ascending: false });
+
+  console.log('loadSessions result', { data, error });
+  if (error) console.error('loadSessions error:', error);
+
   return data || [];
 }
 async function saveProfile(userId, name, level) {
@@ -318,18 +325,7 @@ function render() {
   if (screen === 'profile') { renderProfile(); return; }
 }
 
-let sentEmail = '';
-function renderAuth() {
-  app.innerHTML = `${langBar()}
-    <h1>${t('appTitle')}</h1>
-    <p class="sub" style="margin-bottom:2rem;">&nbsp;</p>
-    <div class="field">
-      <label>${t('emailLabel')}</label>
-      <input type="email" id="inp-email" placeholder="${t('emailPh')}" autocomplete="email" />
-    </div>
-    <button class="btn btn-primary" onclick="sendMagicLink()">${t('sendLink')}</button>`;
-  document.getElementById('inp-email').addEventListener('keydown', e => { if (e.key === 'Enter') sendMagicLink(); });
-}
+
 
 function authErr(id, msg) {
   const el = document.getElementById(id);
@@ -509,15 +505,21 @@ async function doSignIn() {
   const email = (document.getElementById('inp-email')?.value || '').trim();
   const pwd = document.getElementById('inp-pwd')?.value || '';
   if (!email || !pwd) return;
+
   const btn = document.getElementById('btn-signin');
   if (btn) { btn.disabled = true; btn.textContent = '…'; }
   authErrHide('auth-err');
+
   const { data, error } = await sb.auth.signInWithPassword({ email, password: pwd });
+  console.log('signIn result', { data, error });
+
   if (error) {
     authErr('auth-err', t('authErrWrong'));
     if (btn) { btn.disabled = false; btn.textContent = t('signInBtn'); }
     return;
   }
+}
+
   await handleSession(data.session);
 }
 
@@ -525,18 +527,24 @@ async function doRegister() {
   const email = (document.getElementById('inp-email')?.value || '').trim();
   const pwd = document.getElementById('inp-pwd')?.value || '';
   const pwd2 = document.getElementById('inp-pwd2')?.value || '';
+
   if (!email || !pwd) return;
   if (pwd.length < 6) { authErr('reg-err', t('authErrShort')); return; }
   if (pwd !== pwd2) { authErr('reg-err', t('authErrMismatch')); return; }
+
   const btn = document.getElementById('btn-reg');
   if (btn) { btn.disabled = true; btn.textContent = '…'; }
   authErrHide('reg-err');
+
   const { data, error } = await sb.auth.signUp({ email, password: pwd });
+  console.log('register result', { data, error });
+
   if (error) {
     authErr('reg-err', error.message?.includes('already') ? t('authErrExists') : error.message);
     if (btn) { btn.disabled = false; btn.textContent = t('registerBtn'); }
     return;
   }
+
   await handleSession(data.session);
 }
 
@@ -694,24 +702,52 @@ async function doSignOut() {
 
 // ── INIT ──────────────────────────────────────────────────
 async function handleSession(session) {
-  if (!session) { screen = 'auth'; render(); return; }
+  console.log('handleSession start', session);
+  if (!session) {
+    console.log('no session');
+    screen = 'auth';
+    render();
+    return;
+  }
+
+  screen = 'loading';
+  render();
+
   const user = session.user;
   currentUserId = user.id;
+  console.log('user id', user.id);
 
   const timer = setTimeout(() => {
-    if (screen === 'loading') { screen = 'auth'; render(); }
+    console.log('handleSession timeout');
+    screen = 'auth';
+    render();
   }, 7000);
 
   try {
+    console.log('before loadProfile');
     profile = await loadProfile(user.id);
-    clearTimeout(timer);
-    if (!profile) { screen = 'setup'; render(); return; }
+    console.log('after loadProfile', profile);
+
+    if (!profile) {
+      clearTimeout(timer);
+      console.log('no profile -> setup');
+      screen = 'setup';
+      render();
+      return;
+    }
+
+    console.log('before loadSessions');
     sessions = await loadSessions(user.id, profile.level);
-    screen = 'main'; render();
+    console.log('after loadSessions', sessions);
+
+    clearTimeout(timer);
+    screen = 'main';
+    render();
   } catch (e) {
     clearTimeout(timer);
-    console.error('handleSession:', e);
-    screen = 'auth'; render();
+    console.error('handleSession catch:', e);
+    screen = 'auth';
+    render();
   }
 }
 
@@ -720,10 +756,11 @@ async function handleSession(session) {
 
   // Watch for auth changes (sign in via magic link, sign out)
   sb.auth.onAuthStateChange(async (event, session) => {
-    if (settingUp) return;
-    if (event === 'INITIAL_SESSION') return; // handled by getSession() below
-    await handleSession(session);
-  });
+  console.log('auth state change', event, session);
+  if (settingUp) return;
+  if (event === 'INITIAL_SESSION') return;
+  await handleSession(session);
+});
 
   // Initial session check — more reliable than waiting for onAuthStateChange
   let initDone = false;
