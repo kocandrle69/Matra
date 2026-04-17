@@ -90,7 +90,7 @@ select option{background:var(--surf)}
 <script>
 // ── CONFIG ────────────────────────────────────────────────
 const SUPABASE_URL = 'https://vrqrwujuevrwjkuqxnjt.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZycXJ3dWp1ZXZyd2prdXF4bmp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNzE1NjQsImV4cCI6MjA5MTk0NzU2NH0.3pCDPbkKvtuUxNPTynarA-s8elt1pGgNaMAKrA10U38';
+const SUPABASE_ANON_KEY = 'REPLACE_WITH_YOUR_ANON_KEY';
 const SITE_URL = 'https://kocandrle69.github.io/Matra/';
 
 // ── LEVELS ────────────────────────────────────────────────
@@ -235,6 +235,7 @@ let sessions = [];
 let prevScreen = 'main';
 let settingUp = false;
 let sessionType = 'standard';
+let currentUserId = null;
 
 // ── SUPABASE ──────────────────────────────────────────────
 const { createClient } = supabase;
@@ -568,10 +569,8 @@ async function createProfileAction() {
     const sm = Math.max(0, parseInt(document.getElementById('inp-sm')?.value) || 0);
     const sa = Math.max(0, parseInt(document.getElementById('inp-sa')?.value) || 0);
 
-    const { data: authData, error: authErr } = await sb.auth.getUser();
-    if (authErr || !authData?.user) throw new Error('Přihlášení vypršelo — přihlas se znovu.');
-
-    const userId = authData.user.id;
+    const userId = currentUserId;
+    if (!userId) throw new Error('Přihlášení vypršelo — přihlas se znovu.');
 
     const { data: prof, error: insertErr } = await sb.from('profiles')
       .upsert({ id: userId, name, level }, { onConflict: 'id' })
@@ -629,8 +628,7 @@ async function logSession() {
   const malas = parseInt(document.getElementById('inp-malas')?.value) || 0;
   if (malas <= 0) return;
   const agiyariMalas = sessionType === 'agiyari' ? malas : 0;
-  const { data: { user } } = await sb.auth.getUser();
-  const newSession = await addSessionDB(user.id, malas, agiyariMalas, null);
+  const newSession = await addSessionDB(currentUserId, malas, agiyariMalas, null);
   if (newSession) sessions.unshift(newSession);
   sessionType = 'standard';
   render();
@@ -697,6 +695,7 @@ async function doSignOut() {
 async function handleSession(session) {
   if (!session) { screen = 'auth'; render(); return; }
   const user = session.user;
+  currentUserId = user.id;
   try {
     profile = await loadProfile(user.id);
     if (!profile) { screen = 'setup'; render(); return; }
