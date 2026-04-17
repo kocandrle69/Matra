@@ -520,9 +520,6 @@ async function doSignIn() {
   }
 }
 
-  await handleSession(data.session);
-}
-
 async function doRegister() {
   const email = (document.getElementById('inp-email')?.value || '').trim();
   const pwd = document.getElementById('inp-pwd')?.value || '';
@@ -544,8 +541,6 @@ async function doRegister() {
     if (btn) { btn.disabled = false; btn.textContent = t('registerBtn'); }
     return;
   }
-
-  await handleSession(data.session);
 }
 
 async function doReset() {
@@ -760,7 +755,7 @@ async function handleSession(session) {
   if (settingUp) return;
   if (event === 'INITIAL_SESSION') return;
 
-  setTimeout(() => {
+  window.setTimeout(() => {
     handleSession(session);
   }, 0);
 });
