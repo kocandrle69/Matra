@@ -1,60 +1,22 @@
 # Mantra tracker
 
-PWA pro sledování Mantra a Tantra Deeksha opakování.
+Webová PWA aplikace pro sledování pokroku při Mantra a Tantra Deeksha. Každý uživatel má vlastní data rozdělená podle levelu. Funguje na mobilu, tabletu i počítači — přidej si ji na plochu jako klasickou appku.
 
-## Nasazení — krok za krokem
+**Live:** [kocandrle69.github.io/Matra](https://kocandrle69.github.io/Matra/)
 
-### 1. Supabase — databáze
+---
 
-1. Otevři [supabase.com](https://supabase.com) a přihlas se do projektu
-2. Vlevo: **SQL Editor** → **New query**
-3. Zkopíruj obsah souboru `supabase-setup.sql` a klikni **Run**
-4. Vlevo: **Authentication → URL Configuration**
-   - Site URL: `https://kocandrle69.github.io/Matra/`
-   - Redirect URLs: přidej `https://kocandrle69.github.io/Matra/`
-5. Vlevo: **Settings → API**
-   - Zkopíruj **Project URL** a **anon public** klíč
+## Co aplikace umí
 
-### 2. index.html — doplnit klíč
+- Sledování počtu mál a opakování pro každý level zvlášť
+- Oddělené záznamy pro standardní sezení a sezení při agiyari
+- Kontrola pravidla agiyari — počet mál při agiyari nesmí přesáhnout 10 % aktuálně provedeného počtu opakování
+- Vizuální progress bar s červenou čárou aktuálního maxima agiyari
+- Přepínání mezi levely bez ztráty dat — každý level má vlastní historii
+- Přihlášení e-mailem a heslem (funguje na iOS PWA, Safari, Chrome i Android)
+- Tři jazyky: čeština, angličtina, hindština
 
-Otevři `index.html` a na řádku s `SUPABASE_ANON_KEY` nahraď
-`'REPLACE_WITH_YOUR_ANON_KEY'` svým anon klíčem ze Supabase.
-
-```js
-const SUPABASE_ANON_KEY = 'eyJhbGci...'; // tvůj klíč
-```
-
-### 3. Ikony (volitelné, ale doporučené)
-
-Přidej do složky soubory:
-- `icon-192.png` (192×192 px)
-- `icon-512.png` (512×512 px)
-
-Stačí jednoduchá ikona s písmenem "M" na šafránovém pozadí.
-
-### 4. GitHub Pages
-
-```bash
-git clone https://github.com/kocandrle69/Matra.git
-# zkopíruj soubory z tohoto adresáře do klonované složky
-git add .
-git commit -m "Initial deploy"
-git push
-```
-
-Pak v GitHub repozitáři:
-- **Settings → Pages → Source: Deploy from a branch**
-- Branch: `main` / `master`, složka: `/ (root)`
-- Ulož → za ~1 minutu bude appka na `https://kocandrle69.github.io/Matra/`
-
-## Soubory
-
-| Soubor | Popis |
-|--------|-------|
-| `index.html` | Celá aplikace (single file PWA) |
-| `manifest.json` | PWA manifest — název, barvy, ikony |
-| `sw.js` | Service worker — offline podpora |
-| `supabase-setup.sql` | SQL skript pro vytvoření tabulek |
+---
 
 ## Levely
 
@@ -66,3 +28,94 @@ Pak v GitHub repozitáři:
 | Tantra Deeksha 3 | 600 000 | 5 556 | 556 |
 | Tantra Deeksha 4 | 250 000 | 2 315 | 232 |
 | Tantra Deeksha 5 | 500 000 | 4 630 | 463 |
+
+---
+
+## Přidat aplikaci na plochu
+
+**Android (Chrome):** tečky vpravo nahoře → Přidat na úvodní obrazovku
+
+**iOS (Safari):** tlačítko sdílení → Přidat na plochu
+
+**PC (Chrome):** ikona instalace v adresním řádku nebo Menu → Nainstalovat aplikaci
+
+---
+
+## Technický stack
+
+| Vrstva | Technologie |
+|--------|-------------|
+| Frontend | Single-file HTML/CSS/JS, PWA |
+| Hosting | GitHub Pages |
+| Databáze | Supabase (PostgreSQL) |
+| Auth | Supabase Auth — e-mail + heslo |
+| Email | Resend (SMTP) |
+
+---
+
+## Struktura souborů
+
+| Soubor | Popis |
+|--------|-------|
+| `index.html` | Celá aplikace |
+| `manifest.json` | PWA manifest |
+| `sw.js` | Service worker — HTML se nikdy necachuje |
+| `supabase-setup.sql` | Počáteční SQL schéma |
+| `supabase-migration-01.sql` | Migrace — přidání sloupce `level` do sessions |
+
+---
+
+## Nasazení od nuly
+
+### 1. Supabase
+
+1. Vytvoř projekt na [supabase.com](https://supabase.com)
+2. **SQL Editor → New query** → spusť `supabase-setup.sql`
+3. **Authentication → Sign In / Providers → Email** → vypni **Confirm email** → Save
+4. **Authentication → Email** → nastav vlastní SMTP (doporučeno: [resend.com](https://resend.com))
+5. **Settings → API** → zkopíruj Project URL a anon public klíč
+
+### 2. index.html
+
+Nahraď placeholder na dvou místech:
+
+```js
+const SUPABASE_URL = 'https://TVUJ-PROJEKT.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGci...';
+```
+
+### 3. Ikony (volitelné)
+
+Přidej `icon-192.png` a `icon-512.png` pro pěknou ikonku na ploše.
+
+### 4. GitHub Pages
+
+```bash
+git add .
+git commit -m "deploy"
+git push
+```
+
+**Settings → Pages → Source: Deploy from a branch → main → / (root)**
+
+Za ~1 minutu běží na `https://TVUJ-LOGIN.github.io/REPO/`
+
+### 5. Migrace (pokud upgraduješ existující instalaci)
+
+Pokud jsi měl aplikaci nasazenou před přidáním podpory více levelů, spusť v Supabase SQL Editor:
+
+```sql
+ALTER TABLE public.sessions ADD COLUMN IF NOT EXISTS level text NOT NULL DEFAULT '0';
+UPDATE public.sessions s
+SET level = (SELECT p.level FROM public.profiles p WHERE p.id = s.user_id);
+```
+
+---
+
+## Pravidla agiyari
+
+Mála odříkaná při zapáleném agiyari se evidují jako agiyari sezení. Platí:
+
+> Celkový počet agiyari mál nesmí v žádném okamžiku přesáhnout **10 %** celkového počtu dosud provedených opakování.
+
+Po dokončení cílového počtu opakování **i** agiyari části (10 % z cíle) lze požádat gurua o postup do dalšího levelu.
