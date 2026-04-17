@@ -217,7 +217,6 @@ let settingUp = false;
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
-    flowType: 'implicit',
     detectSessionInUrl: true,
     persistSession: true
   }
@@ -560,7 +559,7 @@ async function saveProfileChanges() {
   }
 }
 
-
+async function doSignOut() {
   await sb.auth.signOut();
   profile = null; sessions = [];
   screen = 'auth'; render();
