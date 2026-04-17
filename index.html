@@ -492,7 +492,7 @@ function renderMain() {
 }
 
 function renderHelp() {
-  const sections = ['h1','h2','h3','h4','h5'].map(k =>
+  const sections = ['h1','h2','h3','h6','h4','h5'].map(k =>
     `<div class="help-section"><h3>${t(k+'t')}</h3><p>${t(k+'b')}</p></div>`
   ).join('');
   app.innerHTML = `${langBar()}
