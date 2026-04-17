@@ -1,4 +1,4 @@
-const CACHE = 'mantra-tracker-v3';
+const CACHE = 'mantra-tracker-v4';
 
 self.addEventListener('install', e => {
   self.skipWaiting();
